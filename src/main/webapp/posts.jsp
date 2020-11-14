@@ -32,7 +32,6 @@
         <form method="post" action="${pageContext.request.contextPath}/posts">
             <div class="form-group">
                 <label for="post">Post</label>
-<%--                <input type="text" class="form-control" id="post" name="post">--%>
                 <textarea class="form-control" id="post" name="post" rows="1"></textarea>
             </div>
             <button type="submit" class="btn btn-primary" name="action" value="add">Post</button>
@@ -77,6 +76,7 @@
                 <th scope="col">Updated</th>
                 <th scope="col">Hash Tags</th>
                 <th scope="col">Attachment</th>
+                <th scope="col">Attach</th>
                 <th scope="col">Actions</th>
             </tr>
             </thead>
@@ -87,14 +87,13 @@
                     <th scope="row">${post.id}</th>
                     <td>
                         <label class="sr-only" for="${post.id}_content"></label>
-<%--                        <input id="${post.id}_content" type="text" form="${post.id}_form" name="post"--%>
-<%--                               value="${post.content}" style="word-break: break-word"/>--%>
                         <textarea id="${post.id}_content" form="${post.id}_form" name="post" rows="1">${post.content}</textarea>
                     </td>
                     <td>${post.getFormattedPostedAt()}</td>
                     <td>${post.postedBy}</td>
                     <td>${post.updated}</td>
                     <td>${post.getFormattedTags()}</td>
+                    <td><c:if test="${post.attachmentName != null}"><a type="button" class="btn btn-secondary" href="${pageContext.request.contextPath}/file?id=${post.id}">${post.attachmentName}</a></c:if></td>
                     <td>
                         <div id="modal_${post.id}" class="modal fade">
                             <div class="modal-dialog">
