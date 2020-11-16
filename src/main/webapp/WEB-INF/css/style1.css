@@ -1,0 +1,9 @@
+body > * {
+    filter: invert(100%);
+}
+body {
+    background-color: black;
+}
+.box {
+    height: 100vh;
+}
