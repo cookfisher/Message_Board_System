@@ -133,9 +133,10 @@ public class PostService {
         try {
             Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM POST WHERE ID = ?");
-            preparedStatement.setBoolean(1, true);
+//            preparedStatement.setBoolean(1, true);
+            preparedStatement.setInt(1, id);
 
-            preparedStatement.execute();
+            preparedStatement.executeUpdate();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }

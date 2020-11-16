@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page errorPage = "showRegisterError.jsp" %>
 <html>
 <head>
     <meta charset="utf-8">
@@ -20,7 +21,7 @@
     }
 </style>
 <body>
-<div class="box d-flex align-items-center">
+<div class="box d-inline-flex p-2 align-items-center">
     <div class="container">
         <p style="color: red">
             ${requestScope.errorMessage}
@@ -37,8 +38,9 @@
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
     </div>
+    </br>
+    <div class="container"> <a href="showRegisterError.jsp" >Register an Account</a></div>
 </div>
-
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
         crossorigin="anonymous"></script>
