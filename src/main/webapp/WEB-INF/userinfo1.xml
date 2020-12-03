@@ -1,0 +1,31 @@
+<?xml version = "1.0" encoding="UTF-8" ?>
+<users>
+    <user>
+        <username>john</username>
+        <full_name>John</full_name>
+        <email>john@gmail.com</email>
+        <password>UnvVtdaJ4sMq6XTGIp/3hQ==</password>
+        <membership>concordia</membership>
+    </user>
+    <user>
+        <username>jane</username>
+        <full_name>Jane</full_name>
+        <email>jane@gmail.com</email>
+        <password>WEShXnZWP+3RGED9b0Dqew==</password>
+        <membership>encs</membership>
+    </user>
+    <user>
+        <username>jack123</username>
+        <full_name>Jack</full_name>
+        <email>jack@gmail.com</email>
+        <password>HWweFo42K8AJLyRzmQA6iA==</password>
+        <membership>soen</membership>
+    </user>
+    <user>
+        <username>jia</username>
+        <full_name>Jia</full_name>
+        <email>jia@gmail.com</email>
+        <password>ppB6z1szejIhk/GbZpjIZw==</password>
+        <membership>comp</membership>
+    </user>
+</users>

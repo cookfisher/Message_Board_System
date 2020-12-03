@@ -26,16 +26,17 @@
 <body>
 <div class="box d-flex align-items-center">
     <div class="container">
-        <p style="color: red">
-            ${requestScope.errorMessage}
-        </p>
-        <form method="post" action="${pageContext.request.contextPath}/posts">
-            <div class="form-group">
-                <label for="post">Post</label>
-                <textarea class="form-control" id="post" name="post" rows="1"></textarea>
+        <%-- Logout --%>
+        <div class="row justify-content-end">
+            <div class="col-3">
+                <form action="<%= response.encodeURL("LogoutServlet") %>" method="post" class="mt-2">
+                    <button type="submit" name="request" value="Logout" class="btn btn-primary">
+                        Logout
+                    </button>
+                </form>
             </div>
-            <button type="submit" class="btn btn-primary" name="action" value="add">Post</button>
-        </form>
+        </div>
+
 
         <nav>
             <form class="form-inline" method="get" action="${pageContext.request.contextPath}/posts">
@@ -81,7 +82,7 @@
             </tr>
             </thead>
             <tbody>
-
+            <c:set var="username" scope="session" value="${sessionScope.username}"/>
             <c:forEach var="post" items="${requestScope.posts}">
                 <tr>
                     <th scope="row">${post.id}</th>
@@ -125,13 +126,15 @@
                         <div class="btn btn-success" data-toggle="modal" data-target="#modal_${post.id}">Attachment
                         </div>
                     </td>
-                    <td>
+                    <td><c:if test="${post.postedBy == username}">
+
                         <form id="${post.id}_form" class="form-inline" action="${pageContext.request.contextPath}/posts"
                               method="post">
                             <input type="hidden" value="${post.id}" name="id"/>
                             <button class="btn btn-secondary" name="action" value="edit">Update</button>
                             <button class="btn btn-danger" name="action" value="delete">Delete</button>
                         </form>
+                    </c:if>
                     </td>
                 </tr>
             </c:forEach>
@@ -141,6 +144,17 @@
 
         <ul class="list-group">
         </ul>
+
+            <p style="color: red">
+                ${requestScope.errorMessage}
+            </p>
+            <form method="post" action="${pageContext.request.contextPath}/posts">
+                <div class="form-group">
+                    <label for="post">Post</label>
+                    <textarea class="form-control" id="post" name="post" rows="1"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" name="action" value="add">Post</button>
+            </form>
 
     </div>
 </div>

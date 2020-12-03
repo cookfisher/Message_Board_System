@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Membership>
+    <member>
+        <username>john</username>
+        <group>concordia</group>
+    </member>
+    <member>
+        <username>jane</username>
+        <group>encs</group>
+    </member>
+    <member>
+        <username>jack123</username>
+        <group>soen</group>
+    </member>
+    <member>
+        <username>jia</username>
+        <group>comp</group>
+    </member>
+</Membership>

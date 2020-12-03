@@ -60,6 +60,7 @@ public class FileServlet extends HttpServlet {
                 Part filePart = req.getPart("file");
                 if (filePart.getSize() > 0) {
                     postService.upload(Integer.parseInt(id), filePart);
+
                 }
                 break;
 

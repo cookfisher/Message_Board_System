@@ -1,0 +1,10 @@
+<Groups>
+    <group>
+        concordia
+        <group parent="concordia">
+            encs
+            <group parent="encs">comp</group>
+            <group parent="encs">soen</group>
+        </group>
+    </group>
+</Groups>
