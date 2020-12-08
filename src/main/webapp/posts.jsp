@@ -80,77 +80,141 @@
             </thead>
             <tbody>
             <c:set var="username" scope="session" value="${sessionScope.username}"/>
-            <c:forEach var="post" items="${requestScope.posts}">
-                <tr>
-                    <th scope="row">${post.id}</th>
-                    <td>
-                        <label class="sr-only" for="${post.id}_content"></label>
-<%--                        <c:choose>--%>
-<%--                            <c:when test="${post.postedBy == username}">--%>
+            <c:choose>
+                <c:when test="${sessionScope.membership.contains('admins')}">
+                    <c:forEach var="post" items="${requestScope.posts}">
+                        <tr>
+                            <th scope="row">${post.id}</th>
+                            <td>
+                                <label class="sr-only" for="${post.id}_content"></label>
                                 <textarea id="${post.id}_content" type="text" form="${post.id}_form" name="post" row="1">
-                                    ${post.content}</textarea>
-<%--                            </c:when>--%>
-<%--                            <c:otherwise>--%>
-<%--                                <p>${post.content}</p>--%>
-<%--                            </c:otherwise>--%>
-<%--                        </c:choose>--%>
-
-                    </td>
-                    <td>${post.formattedPostedAt}</td>
-                    <td>${post.postedBy}</td>
-                    <td>${post.groupName}</td>
-                    <td>${post.updated}</td>
-                    <td>${post.formattedTags}</td>
-                    <td>
-                        <c:if test="${post.attachmentName != null}"><a type="button" class="btn btn-secondary" href="${pageContext.request.contextPath}/file?id=${post.id}">${post.attachmentName}</a></c:if>
-                    </td>
-                    <td>
-                        <div id="modal_${post.id}" class="modal fade">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Attachment</h5>
-                                        <div type="button" class="close">
-                                            <span class="button" data-dismiss="modal" aria-hidden="true">&times;</span>
+                                        ${post.content}</textarea>
+                            </td>
+                            <td>${post.formattedPostedAt}</td>
+                            <td>${post.postedBy}</td>
+                            <td>${post.groupName}</td>
+                            <td>${post.updated}</td>
+                            <td>${post.formattedTags}</td>
+                            <td>
+                                <c:if test="${post.attachmentName != null}"><a type="button" class="btn btn-secondary" href="${pageContext.request.contextPath}/file?id=${post.id}">${post.attachmentName}</a></c:if>
+                            </td>
+                            <td>
+                                <div id="modal_${post.id}" class="modal fade">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Attachment</h5>
+                                                <div type="button" class="close">
+                                                    <span class="button" data-dismiss="modal" aria-hidden="true">&times;</span>
+                                                </div>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form enctype="multipart/form-data" id="form_upload_${post.id}"
+                                                      action="${pageContext.request.contextPath}/file"
+                                                      method="post">
+                                                    <input type="hidden" value="${post.id}" name="id"/>
+                                                    <input type="file" id="${post.id}_file" name="file">
+                                                    <c:if test="${post.attachmentName != null}"><a type="button" class="btn btn-secondary" href="${pageContext.request.contextPath}/file?id=${post.id}">Download</a></c:if>
+                                                    <input type="submit" class="btn btn-primary" name="action" value="Upload">
+                                                    <input type="submit" class="btn btn-danger" name="action"
+                                                           value="Remove Attachment">
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <div type="button" class="btn btn-secondary" data-dismiss="modal">Close</div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="modal-body">
-                                        <form enctype="multipart/form-data" id="form_upload_${post.id}"
-                                              action="${pageContext.request.contextPath}/file"
-                                              method="post">
-                                            <input type="hidden" value="${post.id}" name="id"/>
-                                            <input type="file" id="${post.id}_file" name="file">
-                                            <c:if test="${post.attachmentName != null}"><a type="button" class="btn btn-secondary" href="${pageContext.request.contextPath}/file?id=${post.id}">Download</a></c:if>
-                                            <input type="submit" class="btn btn-primary" name="action" value="Upload">
-                                            <input type="submit" class="btn btn-danger" name="action"
-                                                   value="Remove Attachment">
-                                        </form>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <div type="button" class="btn btn-secondary" data-dismiss="modal">Close</div>
+                                </div>
+                                <div class="btn btn-success" data-toggle="modal" data-target="#modal_${post.id}">
+                                    Upload
+                                </div>
+                            </td>
+                            <td>
+                                <form id="${post.id}_form" class="form-inline" action="${pageContext.request.contextPath}/posts"
+                                      method="post">
+                                    <input type="hidden" value="${post.id}" name="id"/>
+                                    <button class="btn btn-secondary" name="action" value="edit">Update</button>
+                                    <button class="btn btn-danger" name="action" value="delete">Delete</button>
+                                </form>
+                            </td>
+                            <td><a href="${pageContext.request.contextPath}/view?id=${post.id}" class="btn btn-primary">View</a></td>
+                        </tr>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <c:forEach var="post" items="${requestScope.posts}">
+                        <tr>
+                            <th scope="row">${post.id}</th>
+                            <td>
+                                <label class="sr-only" for="${post.id}_content"></label>
+                                <c:choose>
+                                    <c:when test="${post.postedBy == username}">
+                                         <textarea id="${post.id}_content" type="text" form="${post.id}_form" name="post" row="1">
+                                                 ${post.content}</textarea>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <p id="${post.id}_content" type="text" form="${post.id}_form" name="post">${post.content}</p>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>${post.formattedPostedAt}</td>
+                            <td>${post.postedBy}</td>
+                            <td>${post.groupName}</td>
+                            <td>${post.updated}</td>
+                            <td>${post.formattedTags}</td>
+                            <td>
+                                <c:if test="${post.attachmentName != null}"><a type="button" class="btn btn-secondary" href="${pageContext.request.contextPath}/file?id=${post.id}">${post.attachmentName}</a></c:if>
+                            </td>
+                            <td>
+                                <div id="modal_${post.id}" class="modal fade">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Attachment</h5>
+                                                <div type="button" class="close">
+                                                    <span class="button" data-dismiss="modal" aria-hidden="true">&times;</span>
+                                                </div>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form enctype="multipart/form-data" id="form_upload_${post.id}"
+                                                      action="${pageContext.request.contextPath}/file"
+                                                      method="post">
+                                                    <input type="hidden" value="${post.id}" name="id"/>
+                                                    <input type="file" id="${post.id}_file" name="file">
+                                                    <c:if test="${post.attachmentName != null}"><a type="button" class="btn btn-secondary" href="${pageContext.request.contextPath}/file?id=${post.id}">Download</a></c:if>
+                                                    <input type="submit" class="btn btn-primary" name="action" value="Upload">
+                                                    <input type="submit" class="btn btn-danger" name="action"
+                                                           value="Remove Attachment">
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <div type="button" class="btn btn-secondary" data-dismiss="modal">Close</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-<%--                        <c:if test="${post.postedBy == username}">--%>
-                        <div class="btn btn-success" data-toggle="modal" data-target="#modal_${post.id}">
-                            Upload
-                        </div>
-<%--                        </c:if>--%>
-                    </td>
-                    <td>
-<%--                        <c:if test="${post.postedBy == username}">--%>
-                        <form id="${post.id}_form" class="form-inline" action="${pageContext.request.contextPath}/posts"
-                              method="post">
-                            <input type="hidden" value="${post.id}" name="id"/>
-                            <button class="btn btn-secondary" name="action" value="edit">Update</button>
-                            <button class="btn btn-danger" name="action" value="delete">Delete</button>
-                        </form>
-<%--                    </c:if>--%>
-                    </td>
-                    <td><a href="${pageContext.request.contextPath}/view?id=${post.id}" class="btn btn-primary">View</a></td>
-                </tr>
-            </c:forEach>
+                                                            <c:if test="${post.postedBy == username}">
+                                <div class="btn btn-success" data-toggle="modal" data-target="#modal_${post.id}">
+                                    Upload
+                                </div>
+                                                            </c:if>
+                            </td>
+                            <td>
+                                                            <c:if test="${post.postedBy == username}">
+                                <form id="${post.id}_form" class="form-inline" action="${pageContext.request.contextPath}/posts"
+                                      method="post">
+                                    <input type="hidden" value="${post.id}" name="id"/>
+                                    <button class="btn btn-secondary" name="action" value="edit">Update</button>
+                                    <button class="btn btn-danger" name="action" value="delete">Delete</button>
+                                </form>
+                                                        </c:if>
+                            </td>
+                            <td><a href="${pageContext.request.contextPath}/view?id=${post.id}" class="btn btn-primary">View</a></td>
+                        </tr>
+                    </c:forEach>
+                </c:otherwise>
+            </c:choose>
 
             </tbody>
         </table>
