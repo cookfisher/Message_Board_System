@@ -1,7 +1,8 @@
 package message.servlets;
 
 import message.entities.User;
-import message.services.UserService;
+import message.services.UserManager;
+import message.utils.UserManagerFactory;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -14,22 +15,26 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class UserLoginServlet extends HttpServlet {
-    private final UserService userService;
+    public static UserManager userManager;
 
     public UserLoginServlet() {
-        userService = new UserService();
+
     }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         ServletContext context = config.getServletContext();
-        InputStream resourceUrl = context.getResourceAsStream("/WEB-INF/USERS.xml");
-
+        InputStream users = context.getResourceAsStream("/WEB-INF/USERS.xml");
+        InputStream groups = context.getResourceAsStream("/WEB-INF/GROUPS.xml");
+        InputStream membership = context.getResourceAsStream("/WEB-INF/MEMBERSHIP.xml");
         try {
-            userService.init(resourceUrl);
-        } catch (IOException e) {
+            String type = config.getServletContext().getInitParameter("userManager");
+            String adminGroup = config.getServletContext().getInitParameter("adminGroup");
+            userManager = UserManagerFactory.getUserManager(type, groups, membership, users, adminGroup);
+        } catch (Exception e) {
             e.printStackTrace();
+            System.exit(0);
         }
     }
 
@@ -42,14 +47,17 @@ public class UserLoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
-
-        User user = userService.login(username, password);
+        User user = userManager.login(username, password);
 
         if (user != null) {
-
             HttpSession session = req.getSession();
             session.setAttribute("username", user.getUsername());
-
+            StringBuilder membership = new StringBuilder();
+            for (String group : userManager.getGroups(user.getUsername())) {
+                membership.append(group).append(",");
+            }
+            membership.deleteCharAt(membership.length() - 1);
+            session.setAttribute("membership", membership.toString());
             resp.sendRedirect(req.getContextPath() + "/posts");
         } else {
             req.setAttribute("errorMessage", "Your username or password is not correct. Please try again.");

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="admin">admins, concordia</entry>
+<entry key="user">encs</entry>
+    <entry key="john">admins, concordia</entry>
+    <entry key="jane">encs</entry>
+    <entry key="jack123">soen</entry>
+    <entry key="jia">comp</entry>
+</properties>

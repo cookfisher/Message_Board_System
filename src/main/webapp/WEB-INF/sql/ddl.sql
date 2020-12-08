@@ -7,5 +7,6 @@ CREATE TABLE POST (
                       CONTENT TEXT NOT NULL,
                       HASH_TAG TEXT NULL,
                       ATTACHMENT VARCHAR(255) NULL,
-                      ATTACHMENT_NAME VARCHAR(255) NULL
+                      ATTACHMENT_NAME VARCHAR(255) NULL,
+                      GROUP_NAME VARCHAR(255)
 )

@@ -1,6 +1,7 @@
 package message.servlets;
 
 import message.entities.Post;
+import message.services.IPostService;
 import message.services.PostService;
 
 import javax.servlet.ServletConfig;
@@ -16,7 +17,7 @@ import java.nio.file.Files;
 
 @MultipartConfig
 public class FileServlet extends HttpServlet {
-    private final PostService postService;
+    private final IPostService postService;
 
     public FileServlet() {
         this.postService = PostService.getInstance();
@@ -28,7 +29,7 @@ public class FileServlet extends HttpServlet {
         String jdbcUrl = config.getServletContext().getInitParameter("jdbcUrl");
         String jdbcUsername = config.getServletContext().getInitParameter("jdbcUsername");
         String jdbcPassword = config.getServletContext().getInitParameter("jdbcPassword");
-        this.postService.init(jdbcUrl, jdbcUsername, jdbcPassword);
+        this.postService.init(jdbcUrl, jdbcUsername, jdbcPassword, UserLoginServlet.userManager);
     }
 
     @Override

@@ -21,6 +21,7 @@ public class Post {
     private List<String> hashTags = new ArrayList<>();;
     private Path attachment;
     private String attachmentName;
+    private String groupName;
 
     public Post() {
     }
@@ -48,7 +49,7 @@ public class Post {
             post.setAttachment(Paths.get(attachment));
         }
         post.setAttachmentName(result.getString("ATTACHMENT_NAME"));
-
+        post.setGroupName(result.getString("GROUP_NAME"));
         return post;
     }
 
@@ -123,5 +124,13 @@ public class Post {
 
     public void setAttachmentName(String attachmentName) {
         this.attachmentName = attachmentName;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }
