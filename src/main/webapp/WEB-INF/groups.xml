@@ -1,10 +1,9 @@
-<Groups>
-    <group>
-        concordia
-        <group parent="concordia">
-            encs
-            <group parent="encs">comp</group>
-            <group parent="encs">soen</group>
-        </group>
-    </group>
-</Groups>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="admins"></entry>
+    <entry key="concordia"></entry>
+    <entry key="encs">concordia</entry>
+    <entry key="soen">encs</entry>
+    <entry key="comp">encs</entry>
+</properties>

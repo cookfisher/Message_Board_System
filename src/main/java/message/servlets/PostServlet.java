@@ -5,7 +5,10 @@ import message.services.PostService;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -26,7 +29,7 @@ public class PostServlet extends HttpServlet {
         String jdbcUrl = config.getServletContext().getInitParameter("jdbcUrl");
         String jdbcUsername = config.getServletContext().getInitParameter("jdbcUsername");
         String jdbcPassword = config.getServletContext().getInitParameter("jdbcPassword");
-        this.postService.init(jdbcUrl, jdbcUsername, jdbcPassword);
+        this.postService.init(jdbcUrl, jdbcUsername, jdbcPassword, UserLoginServlet.userManager);
     }
 
     @Override
@@ -37,25 +40,32 @@ public class PostServlet extends HttpServlet {
         String action = req.getParameter("action");
         String content = req.getParameter("post");
         String id = req.getParameter("id");
+        String groupName = req.getParameter("group_name");
         switch (action) {
             case "add":
                 if (content == null || content.isEmpty()) {
-                    req.setAttribute("errorMessage", "Empty post is not allowed.");
+                    req.setAttribute("errorMessage", "Empty post is now allowed.");
                     doGet(req, resp);
                     return;
                 }
-                postService.create(username, content);
+                if (groupName != null && !groupName.isEmpty()
+                        && !UserLoginServlet.userManager.getGroups(username).contains(groupName)) {
+                    req.setAttribute("errorMessage", "invalid group name.");
+                    doGet(req, resp);
+                    return;
+                }
+                postService.create(username, content, groupName);
                 break;
             case "edit":
                 if (content == null || content.isEmpty()) {
-                    req.setAttribute("errorMessage", "Empty post is not allowed.");
+                    req.setAttribute("errorMessage", "Empty post is now allowed.");
                     doGet(req, resp);
                     return;
                 }
-                postService.update(Integer.parseInt(id), content);
+                postService.update(username, Integer.parseInt(id), content);
                 break;
             case "delete":
-                postService.delete(Integer.parseInt(id));
+                postService.delete(username, Integer.parseInt(id));
                 break;
 
 
@@ -69,6 +79,8 @@ public class PostServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
+        HttpSession session = req.getSession();
+        String username = (String) session.getAttribute("username");
         if (action == null) {
             action = "recent";
         }
@@ -79,12 +91,12 @@ public class PostServlet extends HttpServlet {
                 String from = req.getParameter("from");
                 String to = req.getParameter("to");
                 String hashTag = req.getParameter("hashTag");
-                postStream = postService.search(postedBy, from, to, hashTag)
+                postStream = postService.search(username, postedBy, from, to, hashTag)
                         .sorted(Comparator.comparing(Post::getPostedAt).reversed());
                 break;
             case "recent":
             default:
-                postStream = postService.findAll()
+                postStream = postService.findAll(username)
                         .stream()
                         .sorted(Comparator.comparing(Post::getPostedAt).reversed())
                         .limit(Long.parseLong(getServletContext().getInitParameter("pageSize")));

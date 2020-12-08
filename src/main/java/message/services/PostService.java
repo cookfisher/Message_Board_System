@@ -15,9 +15,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
-public class PostService {
+public class PostService implements IPostService {
     private static final PostService INSTANCE = new PostService();
 
     public static PostService getInstance() {
@@ -28,7 +29,8 @@ public class PostService {
 
     }
 
-    public synchronized void init(String jdbcUrl, String jdbcUsername, String jdbcPassword) {
+    @Override
+    public synchronized void init(String jdbcUrl, String jdbcUsername, String jdbcPassword, UserManager userManager) {
         if (init) {
             return;
         }
@@ -36,6 +38,7 @@ public class PostService {
         this.jdbcUrl = jdbcUrl;
         this.jdbcUsername = jdbcUsername;
         this.jdbcPassword = jdbcPassword;
+        this.userManager = userManager;
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -48,29 +51,32 @@ public class PostService {
         } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();
         }
-
     }
 
     private String jdbcUrl;
     private String jdbcUsername;
     private String jdbcPassword;
+    private UserManager userManager;
 
 
     private boolean init = false;
-    private List<Post> posts = new ArrayList<>();
+    private final List<Post> posts = new ArrayList<>();
 
-    public Post create(String username, String content) {
+    @Override
+    public Post create(String username, String content, String groupName) {
         Post post = new Post(username, LocalDateTime.now(), content);
+        post.setGroupName(groupName);
         post.setHashTags(hashTags(content));
         posts.add(post);
 
         try {
             Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO POST VALUES (NULL, ?, ?, 0, ?, ?, NULL, NULL)");
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO POST VALUES (NULL, ?, ?, 0, ?, ?, NULL, NULL, ?)");
             preparedStatement.setString(1, username);
             preparedStatement.setLong(2, post.getPostedAt().toEpochSecond(ZoneOffset.UTC));
             preparedStatement.setString(3, content);
             preparedStatement.setString(4, String.join(",", post.getHashTags()));
+            preparedStatement.setString(5, groupName);
             preparedStatement.execute();
 
             Statement statement = connection.createStatement();
@@ -104,10 +110,22 @@ public class PostService {
         }
     }
 
-    public List<Post> findAll() {
-        return Collections.unmodifiableList(posts);
+    @Override
+    public List<Post> findAll(String username) {
+        if (isAdmin(username)) {
+            return Collections.unmodifiableList(posts);
+        }
+        List<Post> result = new ArrayList<>();
+        Set<String> groups = userManager.getGroups(username);
+        for (Post post : posts) {
+            if (post.getGroupName().isEmpty() || groups.contains(post.getGroupName())) {
+                result.add(post);
+            }
+        }
+        return result;
     }
 
+    @Override
     public Post find(int id) {
         for (Post post : posts) {
             if (post.getId() == id) {
@@ -117,7 +135,15 @@ public class PostService {
         return null;
     }
 
-    public void update(int id, String content) {
+    private boolean isAdmin(String username) {
+        return userManager.isAdmin(username);
+    }
+
+    @Override
+    public void update(String username, int id, String content) {
+        if (!isAdmin(username) && !find(id).getPostedBy().equals(username)) {
+            return;
+        }
         for (Post post : posts) {
             if (post.getId() == id) {
                 post.setContent(content);
@@ -128,27 +154,33 @@ public class PostService {
         }
     }
 
-    public void delete(int id) {
+    @Override
+    public void delete(String username, int id) {
+        if (!isAdmin(username) && !find(id).getPostedBy().equals(username)) {
+            return;
+        }
         posts.removeIf(post -> post.getId() == id);
         try {
             Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM POST WHERE ID = ?");
-//            preparedStatement.setBoolean(1, true);
-            preparedStatement.setInt(1, id);
+            preparedStatement.setBoolean(1, true);
 
-            preparedStatement.executeUpdate();
+            preparedStatement.execute();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
     }
 
-    public Stream<Post> search(String postedBy, String from, String to, String hashTag) {
+    @Override
+    public Stream<Post> search(String username, String postedBy, String from, String to, String hashTag) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        Set<String> groups = userManager.getGroups(username);
         return posts.stream()
                 .filter(post -> postedBy == null || postedBy.isEmpty() || post.getPostedBy().equals(postedBy))
                 .filter(post -> from == null || from.isEmpty() || post.getPostedAt().isAfter(LocalDate.parse(from, formatter).atStartOfDay()))
                 .filter(post -> to == null || to.isEmpty() || post.getPostedAt().isBefore(LocalDate.parse(to, formatter).plusDays(1).atStartOfDay()))
-                .filter(post -> hashTag == null || hashTag.isEmpty() || post.getHashTags().contains(hashTag));
+                .filter(post -> hashTag == null || hashTag.isEmpty() || post.getHashTags().contains(hashTag))
+                .filter(post -> post.getGroupName().isEmpty() || groups.contains(post.getGroupName()));
     }
 
     private List<String> hashTags(String content) {
@@ -170,6 +202,7 @@ public class PostService {
         return result;
     }
 
+    @Override
     public void upload(int id, Part filePart) throws IOException {
         for (Post post : posts) {
             if (post.getId() == id) {
@@ -183,6 +216,7 @@ public class PostService {
         }
     }
 
+    @Override
     public void remove(int id) {
         for (Post post : posts) {
             if (post.getId() == id) {

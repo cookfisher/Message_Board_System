@@ -1,19 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<Membership>
-    <member>
-        <username>john</username>
-        <group>concordia</group>
-    </member>
-    <member>
-        <username>jane</username>
-        <group>encs</group>
-    </member>
-    <member>
-        <username>jack123</username>
-        <group>soen</group>
-    </member>
-    <member>
-        <username>jia</username>
-        <group>comp</group>
-    </member>
-</Membership>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="admin">admins, concordia</entry>
+<entry key="user">encs</entry>
+    <entry key="john">admins, concordia</entry>
+    <entry key="jane">encs</entry>
+    <entry key="jack123">soen</entry>
+    <entry key="jia">comp</entry>
+</properties>

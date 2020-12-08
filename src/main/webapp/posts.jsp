@@ -19,14 +19,10 @@
     body {
         background-color: black;
     }
-    .box {
-        height: 100vh;
-    }
 </style>
 <body>
 <div class="box d-flex align-items-center">
     <div class="container">
-        <%-- Logout --%>
         <div class="row justify-content-end">
             <div class="col-3">
                 <form action="<%= response.encodeURL("LogoutServlet") %>" method="post" class="mt-2">
@@ -36,7 +32,6 @@
                 </form>
             </div>
         </div>
-
 
         <nav>
             <form class="form-inline" method="get" action="${pageContext.request.contextPath}/posts">
@@ -74,11 +69,13 @@
                 <th scope="col">Content</th>
                 <th scope="col">Posted At</th>
                 <th scope="col">Posted By</th>
+                <th scope="col">Group Name</th>
                 <th scope="col">Updated</th>
                 <th scope="col">Hash Tags</th>
                 <th scope="col">Attachment</th>
                 <th scope="col">Attach</th>
                 <th scope="col">Actions</th>
+                <th scope="col">View a Post</th>
             </tr>
             </thead>
             <tbody>
@@ -88,16 +85,28 @@
                     <th scope="row">${post.id}</th>
                     <td>
                         <label class="sr-only" for="${post.id}_content"></label>
-                        <textarea id="${post.id}_content" form="${post.id}_form" name="post" rows="1">${post.content}</textarea>
+<%--                        <c:choose>--%>
+<%--                            <c:when test="${post.postedBy == username}">--%>
+                                <textarea id="${post.id}_content" type="text" form="${post.id}_form" name="post" row="1">
+                                    ${post.content}</textarea>
+<%--                            </c:when>--%>
+<%--                            <c:otherwise>--%>
+<%--                                <p>${post.content}</p>--%>
+<%--                            </c:otherwise>--%>
+<%--                        </c:choose>--%>
+
                     </td>
-                    <td>${post.getFormattedPostedAt()}</td>
+                    <td>${post.formattedPostedAt}</td>
                     <td>${post.postedBy}</td>
+                    <td>${post.groupName}</td>
                     <td>${post.updated}</td>
-                    <td>${post.getFormattedTags()}</td>
-                    <td><c:if test="${post.attachmentName != null}"><a type="button" class="btn btn-secondary" href="${pageContext.request.contextPath}/file?id=${post.id}">${post.attachmentName}</a></c:if></td>
+                    <td>${post.formattedTags}</td>
+                    <td>
+                        <c:if test="${post.attachmentName != null}"><a type="button" class="btn btn-secondary" href="${pageContext.request.contextPath}/file?id=${post.id}">${post.attachmentName}</a></c:if>
+                    </td>
                     <td>
                         <div id="modal_${post.id}" class="modal fade">
-                            <div class="modal-dialog">
+                            <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Attachment</h5>
@@ -123,19 +132,23 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="btn btn-success" data-toggle="modal" data-target="#modal_${post.id}">Attachment
+<%--                        <c:if test="${post.postedBy == username}">--%>
+                        <div class="btn btn-success" data-toggle="modal" data-target="#modal_${post.id}">
+                            Upload
                         </div>
+<%--                        </c:if>--%>
                     </td>
-                    <td><c:if test="${post.postedBy == username}">
-
+                    <td>
+<%--                        <c:if test="${post.postedBy == username}">--%>
                         <form id="${post.id}_form" class="form-inline" action="${pageContext.request.contextPath}/posts"
                               method="post">
                             <input type="hidden" value="${post.id}" name="id"/>
                             <button class="btn btn-secondary" name="action" value="edit">Update</button>
                             <button class="btn btn-danger" name="action" value="delete">Delete</button>
                         </form>
-                    </c:if>
+<%--                    </c:if>--%>
                     </td>
+                    <td><a href="${pageContext.request.contextPath}/view?id=${post.id}" class="btn btn-primary">View</a></td>
                 </tr>
             </c:forEach>
 
@@ -145,19 +158,24 @@
         <ul class="list-group">
         </ul>
 
-            <p style="color: red">
-                ${requestScope.errorMessage}
-            </p>
-            <form method="post" action="${pageContext.request.contextPath}/posts">
-                <div class="form-group">
-                    <label for="post">Post</label>
-                    <textarea class="form-control" id="post" name="post" rows="1"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary" name="action" value="add">Post</button>
-            </form>
+        <p style="color: red">
+            ${requestScope.errorMessage}
+        </p>
+        <form method="post" action="${pageContext.request.contextPath}/posts">
+            <div class="form-group">
+                <label for="post">Post</label>
+                <textarea class="form-control" id="post" name="post" rows="1"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="group_name">Group Name(${sessionScope.get("membership")}):</label>
+                <input type="text" class="form-control" id="group_name" name="group_name">
+            </div>
+            <button type="submit" class="btn btn-primary" name="action" value="add">Post</button>
+        </form>
 
     </div>
 </div>
+
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
