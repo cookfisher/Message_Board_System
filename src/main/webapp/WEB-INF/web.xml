@@ -25,7 +25,7 @@
     </context-param>
     <context-param>
         <param-name>userManager</param-name>
-        <param-value>message.services.UserManagerImpl</param-value>
+        <param-value>message.usermangerlib.UserManagerImpl</param-value>
     </context-param>
 
     <servlet>

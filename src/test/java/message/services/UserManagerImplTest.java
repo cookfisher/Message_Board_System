@@ -1,18 +1,16 @@
 package message.services;
 
+import message.usermangerlib.UserManagerImpl;
 import org.junit.Test;
-
 import static org.junit.Assert.*;
 
+import java.io.InputStream;
+
 public class UserManagerImplTest {
-
-
     @Test(expected = IllegalArgumentException.class)
-    public void test1() {
-        UserManagerImpl userManagerImpl = new UserManagerImpl();
-        userManagerImpl.addGroup("group1", "group2");
-        userManagerImpl.addGroup("a", null);
-        userManagerImpl.addGroup("b", "a");
+    public void test1(){
+        UserManagerImpl userManager = new UserManagerImpl();
+        userManager.addGroup("group1", "group2");
     }
 
     @Test
@@ -48,11 +46,4 @@ public class UserManagerImplTest {
         assertFalse(userManagerImpl.isAdmin("jane"));
         assertFalse(userManagerImpl.isAdmin("jack123"));
     }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void test4(){
-        UserManagerImpl userManagerImpl = new UserManagerImpl();
-        userManagerImpl.addGroup("group1", "group2");
-    }
-
 }
