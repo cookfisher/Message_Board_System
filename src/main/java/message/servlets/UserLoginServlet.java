@@ -2,7 +2,7 @@ package message.servlets;
 
 import message.entities.User;
 import message.services.UserManager;
-import message.utils.UserManagerFactory;
+import message.services.UserMngFactory;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -31,7 +31,7 @@ public class UserLoginServlet extends HttpServlet {
         try {
             String type = config.getServletContext().getInitParameter("userManager");
             String adminGroup = config.getServletContext().getInitParameter("adminGroup");
-            userManager = UserManagerFactory.getUserManager(type, groups, membership, users, adminGroup);
+            userManager = UserMngFactory.getInstance(type, groups, membership, users, adminGroup);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
